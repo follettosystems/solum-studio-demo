@@ -3,11 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="SOLUM">
 <title>SOLUM Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* VOICE the studio's own app, quiet and exact
@@ -57,7 +58,7 @@ select,input{font:16px Oswald,sans-serif;letter-spacing:.02em;color:#fff;backgro
 .comp input::placeholder{color:#6b7280}
 .send{width:40px;height:40px;flex:none;border-radius:50%;border:0;background:#fff;color:#000;font-size:18px;font-weight:700}
 nav{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--ln);background:rgba(0,0,0,.85);padding:8px 6px max(14px,env(safe-area-inset-bottom))}
-nav button{background:none;border:0;color:#6b7280;font-size:19px;font-weight:700;letter-spacing:.12em;min-height:46px}
+nav button{background:none;border:0;color:#6b7280;font-size:19px;font-weight:700;letter-spacing:.12em;min-height:46px;text-transform:uppercase}
 nav button[aria-pressed=true]{color:#fff}
 .seg{display:flex;gap:6px;margin:0 0 14px;flex-wrap:wrap}
 .seg button{background:var(--p2);border:1px solid var(--ln);color:var(--mu);border-radius:999px;padding:6px 14px;min-height:40px;font-size:14px;text-transform:uppercase;letter-spacing:.08em}
@@ -89,6 +90,7 @@ table.xl{border-collapse:collapse;font:13px system-ui,sans-serif;letter-spacing:
 .empty{color:var(--mu);text-align:center;padding:40px 10px}
 .toast{position:absolute;left:14px;right:14px;bottom:96px;background:#fff;color:#000;border-radius:14px;padding:4px 4px 4px 14px;display:none;justify-content:space-between;align-items:center;z-index:20}
 .toast.on{display:flex}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .toast button{background:none;border:0;font-weight:700;min-height:40px;padding:0 12px;text-transform:uppercase;color:#000}
 /* login */
 .login{position:absolute;inset:0;z-index:40;background:#121212;display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:56px 24px 22px;text-align:center}
@@ -108,8 +110,9 @@ table.xl{border-collapse:collapse;font:13px system-ui,sans-serif;letter-spacing:
 .ver{font-size:11px;color:#6b7280;letter-spacing:.12em;text-transform:uppercase;font-weight:700}
 .shake{animation:sh .35s}
 @keyframes sh{20%,60%{transform:translateX(-9px)}40%,80%{transform:translateX(9px)}}
-.sheet{position:absolute;inset:0;z-index:30;background:rgba(0,0,0,.6);display:none;align-items:flex-end}
-.sheet.on{display:flex}
+.sheet{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;color:inherit;background:transparent;align-items:flex-end}
+.sheet[open]{display:flex}
+.sheet::backdrop{background:rgba(0,0,0,.6)}
 .sheet>div{width:100%;background:var(--p2);border-radius:24px 24px 0 0;padding:20px 18px max(24px,env(safe-area-inset-bottom));border-top:1px solid var(--ln)}
 .sheet p{margin:0 0 14px;color:var(--mu)}
 .sheet b{display:block;color:#fff;font-size:20px}
@@ -124,7 +127,7 @@ table.xl{border-collapse:collapse;font:13px system-ui,sans-serif;letter-spacing:
  .app{max-width:none;display:grid;grid-template-columns:205px minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto auto}
  header{grid-column:2;grid-row:1;padding:14px 32px}
  nav{grid-column:1;grid-row:1/-1;display:flex;flex-direction:column;gap:8px;padding:78px 16px 16px;border-right:1px solid var(--ln);border-top:0}
- nav button{border-radius:10px;text-align:left;padding:0 16px;text-transform:uppercase}
+ nav button{border-radius:10px;text-align:left;padding:0 16px}
  nav button[aria-pressed=true]{background:var(--p2)}
  .scr,.sug,.comp{grid-column:2;width:100%;margin-inline:auto}
  .scr{grid-row:2;max-width:1320px;padding:26px 32px}
@@ -162,13 +165,14 @@ table.xl{border-collapse:collapse;font:13px system-ui,sans-serif;letter-spacing:
   <main class="scr" id="scr"></main>
   <div class="sug" id="sug"></div>
   <div class="comp" id="comp"><form id="f"><input id="q" autocomplete="off" placeholder="Chiedi o inserisci una spesa…" aria-label="Messaggio"><button class="send" type="submit" aria-label="Invia">↑</button></form></div>
-  <div class="toast" id="toast"><span id="tmsg"></span><button data-act="restore" data-t="Ripristina">Annulla</button></div>
+  <div class="toast" id="toast"><span id="tmsg"></span><button data-act="restore" data-t="Ripristina">Ripristina</button></div>
+  <span class="sr-only" id="toast-status" role="status" aria-live="polite" aria-atomic="true"></span>
   <nav>
     <button data-act="tab" data-tab="studio" aria-pressed="false" data-t="Studio">STUDIO</button>
     <button data-act="tab" data-tab="solum" aria-pressed="true">SOLUM</button>
     <button data-act="tab" data-tab="archive" aria-pressed="false" data-t="Archivio">ARCHIVE</button>
   </nav>
-  <div class="sheet" id="sheet" data-act="closemenu"><div><p><b id="mn"></b><span id="mr"></span></p><button class="btn ghost" data-act="logout" style="width:100%" data-t="Esci">Esci</button></div></div>
+  <dialog class="sheet" id="sheet" aria-labelledby="mn" data-act="closemenu"><div><p><b id="mn"></b><span id="mr"></span></p><button class="btn ghost" data-act="logout" style="width:100%" data-t="Esci">Esci</button></div></dialog>
 </div>
 
 <script>
@@ -593,7 +597,7 @@ const projectNames={
  es:{101:'101 · Residencia urbana',102:'102 · Casa junto al lago',103:'103 · Escuela de barrio'}
 };
 const project=id=>projectNames[lang]?.[id]??tr(PROJ[id]);
-const eur=n=>lang==='it'?italianEur(n):new Intl.NumberFormat(lang==='en'?'en-IE':'es-ES',{style:'currency',currency:'EUR'}).format(n);
+const eur=n=>lang==='it'?italianEur(n):new Intl.NumberFormat(lang==='en'?'en-IE':'es-AR',{style:'currency',currency:'EUR'}).format(n);
 const pad=n=>String(n).padStart(2,'0');
 const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
 const dmy=s=>{const [y,m,d]=s.split('-');return d+'/'+m+'/'+y};
@@ -732,7 +736,7 @@ function render(keepScroll){
 /* --- actions --- */
 function answer(src){
  const t=src.toLowerCase(),p=projOf(t),c=catOf(t,'uscita');let who='';for(const k in NAMES)if(t.includes(NAMES[k]))who=k;
- const f=rows.filter(r=>(!p||r.proj===p)&&(!c||r.cat===c||r.type==='entrata')&&(!who||r.payer===who));
+ const f=rows.filter(r=>(!p||r.proj===p)&&(!c||(r.type==='uscita'&&r.cat===c))&&(!who||r.payer===who));
  const o=f.filter(r=>r.type==='uscita').reduce((a,r)=>a+r.amount,0),i=f.filter(r=>r.type==='entrata'&&!c).reduce((a,r)=>a+r.amount,0);
  return ()=>{
   const lab=[p&&project(p),c&&tr(c),who&&USERS[who][0]].filter(Boolean).join(' · ')||tr('tutto lo studio');
@@ -753,7 +757,7 @@ function confirm(id){
  r.id=seq++;rows.push(r);persist();d.state='saved';d.rowId=r.id;
  chat.push({who:'a',render:()=>tr('Salvato. Lo trovi in <b>Studio</b>, nel registro e nel foglio.')});render();
 }
-function toast(m){$('#tmsg').textContent=m;$('#toast').classList.add('on');clearTimeout(tt);tt=setTimeout(()=>$('#toast').classList.remove('on'),6000)}
+function toast(m){$('#tmsg').textContent=m;$('#toast-status').textContent=m;$('#toast').classList.add('on');clearTimeout(tt);tt=setTimeout(()=>{$('#toast').classList.remove('on');$('#toast-status').textContent=''},6000)}
 function startSession(){
  $('#av').textContent=me;chat=[];drafts={};tab='solum';arch='';
  chat.push({who:'a',render:()=>tr('Ciao')+' '+esc(USERS[me][0].split(' ')[0])+'. '+tr('Scrivi una spesa, un incasso o una domanda: preparo la bozza e tu confermi.')});
@@ -793,12 +797,18 @@ app.addEventListener('click',e=>{
  else if(a==='arch'||a==='open-project'){tab='archive';arch=b.dataset.p;render()}
  else if(a==='confirm')confirm(+b.dataset.id);
  else if(a==='cancel'){const d=drafts[+b.dataset.id];if(d.editOf)delete drafts[d.id];else d.state='cancel';render(true)}
- else if(a==='edit'){const r=rows.find(x=>x.id===+b.dataset.row);const d={...r,id:did++,editOf:r.id,unknown:'',state:'open'};drafts[d.id]=d;render(true)}
+ else if(a==='edit'){
+  const r=rows.find(x=>x.id===+b.dataset.row);
+  if(!r||Object.values(drafts).some(d=>d.editOf===r.id&&d.state==='open'))return;
+  const d={...r,id:did++,editOf:r.id,unknown:'',state:'open'};
+  drafts[d.id]=d;
+  render(true);
+ }
  else if(a==='del'){const i=rows.findIndex(x=>x.id===+b.dataset.row);if(i<0)return;lastDel={r:rows[i],i};rows.splice(i,1);render(true);toast(tr('Registrazione eliminata'));persist()}
  else if(a==='restore'){if(lastDel){rows.splice(lastDel.i,0,lastDel.r);lastDel=null;render(true);$('#toast').classList.remove('on');persist()}}
- else if(a==='menu'){$('#mn').textContent=USERS[me][0];$('#mr').textContent=tr(USERS[me][1]);$('#sheet').classList.add('on')}
- else if(a==='closemenu')$('#sheet').classList.remove('on');
- else if(a==='logout'){$('#sheet').classList.remove('on');pick='';pin='';drawLogin();$('#login').hidden=false}
+ else if(a==='menu'){$('#mn').textContent=USERS[me][0];$('#mr').textContent=tr(USERS[me][1]);$('#sheet').showModal()}
+ else if(a==='closemenu')$('#sheet').close();
+ else if(a==='logout'){$('#sheet').close();pick='';pin='';drawLogin();$('#login').hidden=false;$('#login [data-language]').focus()}
  else if(a==='download')downloadSheet();
  else if(a==='copy'){const S=sheetData(),f=v=>typeof v!=='number'?v:lang==='en'?v.toFixed(2):v.toFixed(2).replace('.',',');const tsv=[S.head,...S.body,S.tot].map(r=>r.map(f).join('\t')).join('\n');const out=$('#cpy');const no=()=>out.textContent=tr('Il browser non consente la copia in questa anteprima.');
   try{navigator.clipboard.writeText(tsv).then(()=>out.textContent=tr('Copiato: incollalo in una cella di Excel.'),no)}catch(_){no()}}
@@ -808,10 +818,11 @@ function onField(e){
  if(el.id==='ps'){q=el.value;const pos=el.selectionStart;render();const n=$('#ps');n.focus();n.setSelectionRange(pos,pos);return}
  if(!el.dataset||!el.dataset.f)return;const card=el.closest('.draft');const d=drafts[+card.dataset.id];if(!d)return;const f=el.dataset.f;
  if(f==='amount'){const v=parseAmount(el.value);d.amount=isFinite(v)?v:null}else d[f]=el.value;
- if(f==='type'){if(!(d.type==='entrata'?CIN:COUT).includes(d.cat))d.cat=d.type==='entrata'?tr('Onorari'):'';card.outerHTML=form(d);return}
+ if(f==='type'){if(!(d.type==='entrata'?CIN:COUT).includes(d.cat))d.cat=d.type==='entrata'?'Onorari':'';card.outerHTML=form(d);$(`[data-id="${d.id}"] [data-f="type"]`).focus();return}
  refresh(card,d);
 }
-app.addEventListener('input',onField);app.addEventListener('change',e=>{if(e.target.id!=='ps')onField(e)});
+app.addEventListener('input',e=>{if(e.target.dataset.f!=='type')onField(e)});
+app.addEventListener('change',e=>{if(e.target.dataset.f==='type')onField(e)});
 $('#f').addEventListener('submit',e=>{e.preventDefault();const i=$('#q');send(i.value);i.value=''});
 $('#sug').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(b)send(b.dataset.s)});
 
