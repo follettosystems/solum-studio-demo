@@ -96,7 +96,7 @@ table.xl{border-collapse:collapse;font:13px system-ui,sans-serif;letter-spacing:
 .login{position:absolute;inset:0;z-index:40;background:#121212;display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:56px 24px 22px;text-align:center}
 .login h2{margin:0;font-size:32px;font-weight:700;text-transform:uppercase}
 .login .sub{color:var(--mu);font-size:13px;letter-spacing:.2em;text-transform:uppercase;margin-top:4px}
-.ppl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 18px;margin-top:30px}
+.ppl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 18px;margin-top:30px}
 .ppl button{background:none;border:0;display:grid;justify-items:center;gap:6px;color:var(--mu);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
 .ppl span{width:64px;height:64px;border-radius:50%;background:var(--p2);display:grid;place-items:center;color:#fff;font-size:20px;font-weight:700;border:2px solid transparent}
 .ppl button[aria-pressed=true] span{border-color:#fff}
@@ -142,7 +142,7 @@ table.xl{border-collapse:collapse;font:13px system-ui,sans-serif;letter-spacing:
  .toast{left:auto;bottom:85px;min-width:280px}
  .login{justify-content:center;gap:24px;padding:52px 24px 24px;background:radial-gradient(ellipse at center,#212225,#101010 65%)}
  .login>.language{top:20px;right:32px}
- .ppl{grid-template-columns:repeat(5,minmax(0,1fr))}
+ .ppl{grid-template-columns:repeat(2,minmax(0,1fr))}
  .xl th,.xl td{padding:9px 12px}
 }
 </style>
@@ -177,33 +177,38 @@ table.xl{border-collapse:collapse;font:13px system-ui,sans-serif;letter-spacing:
 
 <script>
 {
-const USERS={AL:['Alessandro','Socio'],MA:['Mattia','Socio'],FG:['Filippo','Socio'],LC:['Lorenzo','Socio'],CO:['Collaboratore','Collaboratore']};
-const NAMES={AL:'alessandro',MA:'mattia',FG:'filippo',LC:'lorenzo'};
+const USERS={AL:['Alessandro','Socio'],CO:['Collaboratore','Collaboratore']};
+const NAMES={AL:'alessandro'};
 const PROJ={'101':'101_Residenza urbana','102':'102_Casa sul lago','103':'103_Scuola di quartiere','000':'Spese generali studio'};
 const KW_OUT=[['Affitto',/affitt|alquiler|\brent\b/],['Utenze',/bollett|utilities|electricidad|electricity|luce|elettric|\bgas\b|internet|telefon/],['Pulizie',/pulizi|limpieza|cleaning/],['Plotter e stampe',/plotter|print|impresi|stamp|carta|toner/],['Software e licenze',/software|licen[cs]|licenz|rhino|autocad|adobe|archicad|abbonament/],['Trasferte',/treno|train|tren|travel|viaje|benzin|autostrad|taxi|trasfert|parchegg|sopralluog/],['Materiali e modelli',/plastic|materials|maquet|modell|material|campion/],['Cancelleria',/cancelleri|office supplies|papeler|penne|quadern/],['Consulenze esterne',/consulen|consulting|consultor|ingegner|geometr|strutturist/],['Tasse e contributi',/tass|taxes|impuestos|\bf24\b|\biva\b|inarcassa|contribut/]];
 const KW_IN=[['Onorari',/fattur|invoice|factura|honorarios|onorar|parcell|acconto/],['Rimborsi',/rimbors|reembols|reimburs/],['Altre entrate',/$^/]];
 const COUT=KW_OUT.map(k=>k[0]),CIN=KW_IN.map(k=>k[0]);
 const GENERAL=['Affitto','Utenze','Pulizie','Software e licenze','Cancelleria','Tasse e contributi'];
-const SUG={en:['I spent €50 on plotter paper for project 101','Mattia paid €1,200 in rent','Received €3,500 for project 102','I spent €30 on a train yesterday','How much did we spend on project 101?'],es:['Gasté 50 € en papel de plotter para el proyecto 101','Mattia pagó 1.200 € de alquiler','Cobré 3.500 € para el proyecto 102','Gasté 30 € en tren ayer','¿Cuánto gastamos en el proyecto 101?'],it:['Ho speso 50 € di carta plotter per il 101','Mattia ha pagato l’affitto di novembre, 1.200 €','Incassata fattura da 3.500 € per Casa sul lago','Marco ha speso 30 € di treno ieri','Quanto abbiamo speso per il 101?']};
+const SUG={en:['I spent €50 on plotter paper for project 101','Add a project called Via Garibaldi and log €100 of plotter paper','I paid €1,200 in rent','Received €3,500 for project 102','I spent €30 on a train yesterday','How much did we spend on project 101?'],es:['Gasté 50 € en papel de plotter para el proyecto 101','Agregá un proyecto que se llama Vía Garibaldi y anotá 100 € de plotter','Pagué 1.200 € de alquiler','Cobré 3.500 € para el proyecto 102','Gasté 30 € en tren ayer','¿Cuánto gastamos en el proyecto 101?'],it:['Ho speso 50 € di carta plotter per il 101','Aggiungi un progetto che si chiama via Garibaldi e metti che ho speso 100 euro di plotter','Ho pagato l’affitto di novembre, 1.200 €','Incassata fattura da 3.500 € per Casa sul lago','Ho speso 30 € di treno ieri per un sopralluogo','Quanto abbiamo speso per il 101?']};
 let me='AL',pick='',pin='',tab='solum',sv='reg',sheet='mov',arch='',q='',seq=7,did=1,lastDel=null,tt=null;
 let rows=[
- {id:1,date:'2026-11-03',desc:'Affitto studio novembre',proj:'000',cat:'Affitto',payer:'MA',type:'uscita',amount:1200},
- {id:2,date:'2026-11-05',desc:'Carta plotter A0',proj:'101',cat:'Plotter e stampe',payer:'MA',type:'uscita',amount:25},
+ {id:1,date:'2026-11-03',desc:'Affitto studio novembre',proj:'000',cat:'Affitto',payer:'AL',type:'uscita',amount:1200},
+ {id:2,date:'2026-11-05',desc:'Carta plotter A0',proj:'101',cat:'Plotter e stampe',payer:'CO',type:'uscita',amount:25},
  {id:3,date:'2026-11-10',desc:'Rinnovo licenza Rhino',proj:'000',cat:'Software e licenze',payer:'AL',type:'uscita',amount:995},
  {id:4,date:'2026-11-12',desc:'Incasso fattura acconto',proj:'101',cat:'Onorari',payer:'AL',type:'entrata',amount:2000},
- {id:5,date:'2026-11-14',desc:'Treno per sopralluogo',proj:'102',cat:'Trasferte',payer:'FG',type:'uscita',amount:18.4},
- {id:6,date:'2026-11-16',desc:'Modello in legno concorso',proj:'103',cat:'Materiali e modelli',payer:'LC',type:'uscita',amount:140}
+ {id:5,date:'2026-11-14',desc:'Treno per sopralluogo',proj:'102',cat:'Trasferte',payer:'CO',type:'uscita',amount:18.4},
+ {id:6,date:'2026-11-16',desc:'Modello in legno concorso',proj:'103',cat:'Materiali e modelli',payer:'CO',type:'uscita',amount:140}
 ];
-const storageKey='solum-studio-demo-v1';
+const BASE_PROJ=['000','101','102','103'];
+const storageKey='solum-studio-demo-v2';
 try {
  const saved=JSON.parse(localStorage.getItem(storageKey));
  if(saved && Array.isArray(saved.rows) && Number.isSafeInteger(saved.seq)){
   rows=saved.rows;
   seq=saved.seq;
  }
+ if(saved && saved.projects && typeof saved.projects==='object'){
+  for(const [k,v] of Object.entries(saved.projects))if(/^\d{3}$/.test(k)&&!BASE_PROJ.includes(k)&&typeof v==='string')PROJ[k]=v;
+ }
 } catch {}
 function persist(){
- try {localStorage.setItem(storageKey,JSON.stringify({rows,seq}));}
+ const projects=Object.fromEntries(Object.entries(PROJ).filter(([k])=>!BASE_PROJ.includes(k)));
+ try {localStorage.setItem(storageKey,JSON.stringify({rows,seq,projects}));}
  catch {toast(tr('Salvataggio locale non disponibile'));}
 }
 let chat=[],drafts={};
@@ -591,6 +596,20 @@ const translations={
   "es": "Persona ajena al equipo"
  }
 };
+Object.assign(translations,{
+ "Nuovo progetto da confermare":{"en":"New project to confirm","es":"Proyecto nuevo para confirmar"},
+ "Numero":{"en":"Number","es":"Número"},
+ "Nome":{"en":"Name","es":"Nombre"},
+ "Crea progetto":{"en":"Create project","es":"Crear proyecto"},
+ "Nuovo":{"en":"New","es":"Nuevo"},
+ "Confermando crei anche il progetto":{"en":"Confirming also creates the project","es":"Al confirmar también creás el proyecto"},
+ "Scrivi il nome del progetto":{"en":"Enter the project name","es":"Escribí el nombre del proyecto"},
+ "Esiste già un progetto con questo nome":{"en":"A project with this name already exists","es":"Ya existe un proyecto con este nombre"},
+ "Ecco il nuovo progetto. Controlla il nome e conferma:":{"en":"Here is the new project. Check the name and confirm.","es":"Este es el proyecto nuevo. Revisá el nombre y confirmá."},
+ "Esiste già un progetto con questo nome. Puoi cambiare il nome qui sotto:":{"en":"A project with this name already exists. You can change the name below.","es":"Ya existe un proyecto con este nombre. Podés cambiarlo acá abajo."},
+ "Progetto creato":{"en":"Project created","es":"Proyecto creado"},
+ "Creato":{"en":"Created","es":"Creado"}
+});
 const tr=key=>translations[key]?.[lang]??key;
 const projectNames={
  en:{101:'101 · Urban residence',102:'102 · Lake house',103:'103 · Neighborhood school'},
@@ -616,22 +635,49 @@ function amountOf(src){
  const v=parseAmount(m[1]||m[2]);
  return Number.isFinite(v)&&v>0?{v,raw:m[0]}:null;
 }
-function payerOf(src){const t=src.toLowerCase();for(const c in NAMES)if(new RegExp('\\b'+NAMES[c]+'\\b').test(t))return{c};const k=src.match(/\b(AL|MA|FG|LC)\b/);if(k)return{c:k[1]};const u=src.match(/\b([A-Z][a-zàèéìòù]+)\s+(?:(?:ha|hanno)\s+(?:pagato|speso|comprato|anticipato|incassato)|paid|spent|bought|received|pagó|gastó|compró|cobró)/)||src.match(/da parte di\s+([A-Z][a-zàèéìòù]+)/);if(u)return{unknown:u[1]};return{c:me}}
+function payerOf(src){const t=src.toLowerCase();for(const c in NAMES)if(new RegExp('\\b'+NAMES[c]+'\\b').test(t))return{c};const k=src.match(/\b(AL|CO)\b/);if(k)return{c:k[1]};const u=src.match(/\b([A-Z][a-zàèéìòù]+)\s+(?:(?:ha|hanno)\s+(?:pagato|speso|comprato|anticipato|incassato)|paid|spent|bought|received|pagó|gastó|compró|cobró)/)||src.match(/da parte di\s+([A-Z][a-zàèéìòù]+)/);if(u)return{unknown:u[1]};return{c:me}}
 function catOf(t,type){for(const [n,re] of (type==='entrata'?KW_IN:KW_OUT))if(re.test(t))return n;return type==='entrata'?'Onorari':''}
-function projOf(t){const m=t.match(/\b(10[1-3])\b/);if(m)return m[1];if(/giulian|residenza|urban residence|residencia urbana/.test(t))return'101';if(/lago|lake/.test(t))return'102';if(/brera|scuola|school|escuela/.test(t))return'103';if(/studio|estudio|general|overhead/.test(t))return'000';return''}
+const SKIP=['casa','della','dello','delle','sulla','corso','piazza','viale','house','street','calle','avenida'];
+const norm=v=>String(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+const projName=k=>norm((PROJ[k]||'').split('_').slice(1).join('_'));
+function customProjOf(t){
+ t=norm(t);
+ for(const k in PROJ){if(BASE_PROJ.includes(k))continue;const n=projName(k);if(n&&t.includes(n))return k}
+ for(const k in PROJ){if(BASE_PROJ.includes(k))continue;const w=projName(k).split(/\s+/).filter(x=>x.length>3&&!SKIP.includes(x));if(w.some(x=>t.includes(x)))return k}
+ return '';
+}
+const titleCase=v=>v.trim().toLowerCase().split(/\s+/).map((w,i)=>i&&/^(di|da|del|della|dei|e|al|alla|sul|sulla|in|de|la|el|y|of|the|and)$/.test(w)?w:w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
+const NEWPROJ=[
+ /(?:aggiungi|crea|apri|inserisci)\s+(?:un\s+)?(?:nuovo\s+)?progetto\s+(?:che\s+si\s+chiama\s+|chiamato\s+|denominato\s+|di\s+nome\s+|dal\s+nome\s+|:\s*)?["«“]?(.+?)["»”]?(?=\s+e\s+|,|\.|;|$)/i,
+ /(?:add|create|open)\s+(?:a\s+)?(?:new\s+)?project\s+(?:called\s+|named\s+|:\s*)?["“]?(.+?)["”]?(?=\s+and\s+|,|\.|;|$)/i,
+ /(?:agreg[aá]|añad[eí]|cre[aá]|abr[ií])\s+(?:un\s+)?(?:nuevo\s+)?proyecto\s+(?:que\s+se\s+llama\s+|llamado\s+|:\s*)?["«“]?(.+?)["»”]?(?=\s+y\s+|,|\.|;|$)/i,
+ /(?:nuovo\s+progetto|new\s+project|nuevo\s+proyecto)\s*:?\s*["«“]?(.+?)["»”]?(?=\s+(?:e|and|y)\s+|,|\.|;|$)/i
+];
+function newProjOf(src){
+ for(const re of NEWPROJ){const m=src.match(re);if(m&&m[1].trim())return{name:titleCase(m[1].replace(/["«»“”]/g,'')),raw:m[0]}}
+ return null;
+}
+const nextNum=()=>String(Math.max(100,...Object.keys(PROJ).map(Number))+1).padStart(3,'0');
+const findByName=n=>Object.keys(PROJ).find(k=>k!=='000'&&projName(k)===norm(n.trim()));
+function projOf(t){const n=t.match(/\b(\d{3})\b/);if(n&&PROJ[n[1]]&&n[1]!=='000')return n[1];const c=customProjOf(t);if(c)return c;const m=t.match(/\b(10[1-3])\b/);if(m)return m[1];if(/giulian|residenza|urban residence|residencia urbana/.test(t))return'101';if(/lago|lake/.test(t))return'102';if(/brera|scuola|school|escuela/.test(t))return'103';if(/studio|estudio|general|overhead/.test(t))return'000';return''}
 function dateOf(t){const d=new Date();if(/\b(ieri|ayer|yesterday)\b/.test(t))d.setDate(d.getDate()-1);const m=t.match(/\b(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?\b/);if(m){let y=m[3]?+m[3]:d.getFullYear();if(y<100)y+=2000;return iso(new Date(y,+m[2]-1,+m[1]))}return iso(d)}
-function parse(src){
+function parse(src,np){
  const t=src.toLowerCase(),a=amountOf(src);
  const type=/incass|ricevut|entrat|ci hanno pagato|received|collected|income|cobr[éeó]|recib[íió]|ingres[óo]/.test(t)?'entrata':'uscita';
- const p=payerOf(src),cat=catOf(t,type);let proj=projOf(t);
+ const p=payerOf(src),cat=catOf(t,type);let proj='',newProj='';
+ if(np){const ex=findByName(np.name);if(ex)proj=ex;else{newProj=np.name;proj='new'}}
+ else proj=projOf(t);
  if(!proj&&GENERAL.includes(cat))proj='000';
- let desc=src;if(a)desc=desc.replace(a.raw,'');
- desc=desc.replace(/\b(alessandro|mattia|filippo|lorenzo|ieri|oggi)\b/gi,'').replace(/\b(ho|abbiamo|ha|hanno)\s+(speso|pagato|comprato|incassato|anticipato)\b/i,'').replace(/\s+(?:per|for|para)\s+(?:(?:il|the|el)\s+)?(?:(?:progetto|project|proyecto)\s+)?10[1-3]\b/i,'').replace(/\b(per il|per|di|da)\s*[,.]?\s*$/i,'').replace(/^\s*(?:(?:I|we)\s+(?:spent|paid|bought|received)|received|gasté|pagué|compré|cobré|recibí)\s*/i,'').replace(/^\s*(?:on|en)\s+/i,'').replace(/\s+/g,' ').replace(/^\s*(di|del|della|dei|da|per)\s+/i,'').replace(/^[\s,.:-]+|[\s,.:-]+$/g,'');
+ let desc=src;if(np)desc=desc.replace(np.raw,'');if(a)desc=desc.replace(a.raw,'');
+ desc=desc.replace(/\band\s+add\s+/i,' ').replace(/\b(?:e\s+|and\s+|y\s+)?(?:metti|segna|registra|scrivi|log|record|anot[aá]|pon[eé]|registr[aá])\s+(?:anche\s+|also\s+|también\s+)?(?:che\s+|that\s+|que\s+)?/gi,' ').replace(/^\s*(?:e|and|y)\s+/i,'');
+ desc=desc.replace(/\b(alessandro|ieri|oggi)\b/gi,'').replace(/\b(ho|abbiamo|ha|hanno)\s+(speso|pagato|comprato|incassato|anticipato)\b/i,'').replace(/\s+(?:per|for|para)\s+(?:(?:il|the|el)\s+)?(?:(?:progetto|project|proyecto)\s+)?10[1-3]\b/i,'').replace(/\b(per il|per|di|da)\s*[,.]?\s*$/i,'').replace(/^\s*(?:(?:I|we)\s+(?:spent|paid|bought|received)|received|gasté|pagué|compré|cobré|recibí)\s*/i,'').replace(/^\s*(?:on|en)\s+/i,'').replace(/\s+/g,' ').replace(/^\s*(di|del|della|dei|da|per)\s+/i,'').replace(/^[\s,.:-]+|[\s,.:-]+$/g,'');
+ desc=desc.replace(/^\s*(?:of|de|del|di)\s+/i,'').trim();
  desc=desc.charAt(0).toUpperCase()+desc.slice(1);
- return{id:did++,type,amount:a?a.v:null,payer:p.c||'',unknown:p.unknown||'',cat,proj,date:dateOf(t),desc:desc.slice(0,70),state:'open'};
+ return{id:did++,type,amount:a?a.v:null,payer:p.c||'',unknown:p.unknown||'',cat,proj,newProj,date:dateOf(t),desc:desc.slice(0,70),state:'open'};
 }
 function validate(d){
  const v=[];
+ if(d.kind==='proj'){if(!d.name.trim())v.push(['name',tr('Scrivi il nome del progetto')]);else if(findByName(d.name))v.push(['name',tr('Esiste già un progetto con questo nome')]);return v}
  if(!(d.amount>0))v.push(['amount',tr('Manca l’importo')]);
  if(!d.payer)v.push(['payer',d.unknown?tr('Persona fuori dal team')+' · '+d.unknown:tr('Scegli chi ha pagato')]);
  if(!(d.type==='entrata'?CIN:COUT).includes(d.cat))v.push(['cat',tr('Scegli una categoria dall’elenco')]);
@@ -642,15 +688,22 @@ function validate(d){
 const opts=(list,cur,blank)=>(blank?'<option value="">'+tr('— scegli —')+'</option>':'')+list.map(([v,l])=>`<option value="${esc(v)}"${v===cur?' selected':''}>${esc(l)}</option>`).join('');
 function form(d){
  const v=validate(d),bad=new Set(v.map(x=>x[0])),cl=f=>bad.has(f)?' class="bad"':'';
+ if(d.kind==='proj')return `<div class="draft" data-id="${d.id}"><p class="dh">${tr('Nuovo progetto da confermare')}</p><div class="fg">
+ <label>${tr('Numero')}<input value="${esc(d.num)}" disabled></label>
+ <label${cl('name')}>${tr('Nome')}<input data-f="name" value="${esc(d.name)}"></label></div>
+ <ul class="warn">${v.map(x=>'<li>'+esc(x[1])+'</li>').join('')}</ul>
+ <div class="btns"><button class="btn" data-act="confirm" data-id="${d.id}"${v.length?' disabled':''}>${tr('Crea progetto')}</button><button class="btn ghost" data-act="cancel" data-id="${d.id}">${tr('Annulla')}</button></div></div>`;
+ const projList=Object.keys(PROJ).map(id=>[id,project(id)]);if(d.newProj)projList.unshift(['new',tr('Nuovo')+': '+nextNum()+'_'+d.newProj]);
  const cats=(d.type==='entrata'?CIN:COUT).map(c=>[c,tr(c)]);
  return `<div class="draft" data-id="${d.id}"><p class="dh">${d.editOf?tr('Modifica registrazione'):tr('Bozza da confermare')}</p><div class="fg">
  <label>${tr('Tipo')}<select data-f="type">${opts([['uscita',tr('Uscita')],['entrata',tr('Entrata')]],d.type)}</select></label>
  <label${cl('amount')}>${tr('Importo €')}<input data-f="amount" inputmode="decimal" value="${d.amount==null?'':lang==='en'?String(d.amount):String(d.amount).replace('.',',')}"></label>
  <label${cl('payer')}>${d.type==='entrata'?tr('Incassato da'):tr('Pagato da')}<select data-f="payer">${opts(Object.keys(USERS).map(k=>[k,k+' · '+USERS[k][0]]),d.payer,true)}</select></label>
  <label${cl('cat')}>${tr('Categoria')}<select data-f="cat">${opts(cats,d.cat,true)}</select></label>
- <label class="w${bad.has('proj')?' bad':''}">${tr('Progetto')}<select data-f="proj">${opts(Object.keys(PROJ).map(id=>[id,project(id)]),d.proj,true)}</select></label>
+ <label class="w${bad.has('proj')?' bad':''}">${tr('Progetto')}<select data-f="proj">${opts(projList,d.proj,true)}</select></label>
  <label${cl('date')}>${tr('Data')}<input type="date" data-f="date" value="${esc(d.date)}"></label>
  <label class="w">${tr('Descrizione')}<input data-f="desc" value="${esc(d.desc)}"></label></div>
+ ${d.proj==='new'?'<p class="note">'+tr('Confermando crei anche il progetto')+' <b>'+esc(nextNum()+'_'+d.newProj)+'</b>.</p>':''}
  <ul class="warn">${v.map(x=>'<li>'+esc(x[1])+'</li>').join('')}</ul>
  <div class="btns"><button class="btn" data-act="confirm" data-id="${d.id}"${v.length?' disabled':''}>${d.editOf?tr('Salva'):tr('Conferma')}</button><button class="btn ghost" data-act="cancel" data-id="${d.id}">${tr('Annulla')}</button></div></div>`;
 }
@@ -666,6 +719,7 @@ const sign=r=>`<span class="${r.type==='entrata'?'in':'out'}">${r.type==='entrat
 function chatHTML(){
  return chat.map(m=>{
   if(m.who==='d'){const d=drafts[m.id];if(!d)return'';
+   if(d.kind==='proj'&&d.state==='saved')return `<div class="done"><span><b>${tr('Creato')}</b> · ${esc(project(d.created))}</span><button class="lnk" data-act="open-project" data-p="${esc(d.created)}">${tr('Apri progetto')}</button></div>`;
    if(d.state==='saved'){const r=rows.find(x=>x.id===d.rowId);return r?`<div class="done"><span><b>${tr('Salvato')}</b> · ${esc(r.desc||tr(r.cat))} · ${sign(r)}</span><button class="lnk" data-act="del" data-row="${r.id}">${tr('Annulla')}</button><button class="lnk" data-act="open-project" data-p="${esc(r.proj)}">${tr('Apri progetto')}</button></div>`:'<div class="done"><span>'+tr('Registrazione eliminata')+'</span></div>'}
    if(d.state==='cancel')return '<div class="done"><span>'+tr('Bozza scartata, nulla è stato salvato')+'</span></div>';
    return form(d)}
@@ -746,15 +800,21 @@ function answer(src){
 function send(text){
  text=text.trim();if(!text)return;
  chat.push({who:'u',html:esc(text)});
- if(!amountOf(text)&&(/\?/.test(text)||/^(quanto|qual|totale|quante|how much|how many|what|total|cu[aá]nt[oa])/i.test(text)))chat.push({who:'a',render:answer(text)});
- else{const d=parse(text);drafts[d.id]=d;chat.push({who:'a',render:(validate(d).length?()=>tr('Ho preparato la bozza, ma manca qualcosa. Completa i campi evidenziati:'):()=>tr('Ecco la bozza. Controlla e conferma:'))});chat.push({who:'d',id:d.id})}
+ const np=newProjOf(text);
+ if(np&&!amountOf(text)){const d={id:did++,kind:'proj',num:nextNum(),name:np.name,state:'open'};drafts[d.id]=d;const dup=!!findByName(np.name);
+  chat.push({who:'a',render:()=>dup?tr('Esiste già un progetto con questo nome. Puoi cambiare il nome qui sotto:'):tr('Ecco il nuovo progetto. Controlla il nome e conferma:')});chat.push({who:'d',id:d.id})}
+ else if(!amountOf(text)&&(/\?/.test(text)||/^(quanto|qual|totale|quante|how much|how many|what|total|cu[aá]nt[oa])/i.test(text)))chat.push({who:'a',render:answer(text)});
+ else{const d=parse(text,np);drafts[d.id]=d;chat.push({who:'a',render:(validate(d).length?()=>tr('Ho preparato la bozza, ma manca qualcosa. Completa i campi evidenziati:'):()=>tr('Ecco la bozza. Controlla e conferma:'))});chat.push({who:'d',id:d.id})}
  tab='solum';render();
 }
 function confirm(id){
  const d=drafts[id];if(!d||validate(d).length)return;
+ if(d.kind==='proj'){const k=nextNum();PROJ[k]=k+'_'+d.name.trim();d.state='saved';d.created=k;persist();chat.push({who:'a',render:()=>tr('Progetto creato')+': <b>'+esc(project(k))+'</b>'});render();return}
+ let made='';if(d.proj==='new'){const k=nextNum();PROJ[k]=k+'_'+d.newProj;d.proj=k;d.newProj='';made=k}
  const r={date:d.date,desc:d.desc,proj:d.proj,cat:d.cat,payer:d.payer,type:d.type,amount:d.amount};
  if(d.editOf){const existing=rows.find(x=>x.id===d.editOf);if(!existing)return;Object.assign(existing,r);persist();delete drafts[id];render(true);return}
  r.id=seq++;rows.push(r);persist();d.state='saved';d.rowId=r.id;
+ if(made)chat.push({who:'a',render:()=>tr('Progetto creato')+': <b>'+esc(project(made))+'</b>'});
  chat.push({who:'a',render:()=>tr('Salvato. Lo trovi in <b>Studio</b>, nel registro e nel foglio.')});render();
 }
 function toast(m){$('#tmsg').textContent=m;$('#toast-status').textContent=m;$('#toast').classList.add('on');clearTimeout(tt);tt=setTimeout(()=>{$('#toast').classList.remove('on');$('#toast-status').textContent=''},6000)}
@@ -818,6 +878,7 @@ function onField(e){
  if(el.id==='ps'){q=el.value;const pos=el.selectionStart;render();const n=$('#ps');n.focus();n.setSelectionRange(pos,pos);return}
  if(!el.dataset||!el.dataset.f)return;const card=el.closest('.draft');const d=drafts[+card.dataset.id];if(!d)return;const f=el.dataset.f;
  if(f==='amount'){const v=parseAmount(el.value);d.amount=isFinite(v)?v:null}else d[f]=el.value;
+ if(f==='proj'&&d.kind!=='proj'){card.outerHTML=form(d);$(`[data-id="${d.id}"] [data-f="proj"]`).focus();return}
  if(f==='type'){if(!(d.type==='entrata'?CIN:COUT).includes(d.cat))d.cat=d.type==='entrata'?'Onorari':'';card.outerHTML=form(d);$(`[data-id="${d.id}"] [data-f="type"]`).focus();return}
  refresh(card,d);
 }
