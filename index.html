@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SOLUM">
+<title>SOLUM Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE the studio's own app, quiet and exact
+   IDEA their SOLUM prototype, now working: PIN, chat, register, sheet, archive
+   PICTURE the app itself, full screen
+   COLOUR black, graphite #1c1c1e, white ink; green and red only for money in and out
+   TYPE Oswald throughout, as in their prototype
+   LAYOUT one phone-width column centred on any screen, nav at the bottom */
+:root{color-scheme:dark;--bg:#000;--p1:#121212;--p2:#1c1c1e;--p3:#2c2c2e;--ln:rgba(255,255,255,.1);--mu:#9ca3af;--in:#4ade80;--out:#f87171;--warn:#fbbf24}
+*{box-sizing:border-box;min-width:0}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0;background:#000;color:#fff}
+body{font:16px/1.45 Oswald,'Arial Narrow',sans-serif;letter-spacing:.02em;overflow:hidden;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.app{position:relative;height:100%;max-width:480px;margin:0 auto;display:flex;flex-direction:column;overflow:hidden;background:radial-gradient(120% 70% at 50% 0%,#1d1e22 0%,#000 70%)}
+header{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:max(14px,env(safe-area-inset-top)) 18px 10px;border-bottom:1px solid rgba(255,255,255,.05);background:rgba(0,0,0,.4)}
+header h1{margin:0;font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:.1em}
+.av{width:36px;height:36px;border-radius:50%;border:0;background:#fff;color:#000;font-weight:700;font-size:13px}
+.scr{flex:1;overflow-y:auto;padding:14px 16px 16px;scrollbar-width:none}
+.scr::-webkit-scrollbar{display:none}
+.msg{max-width:86%;margin:0 0 10px;padding:10px 14px;border-radius:18px;font-size:15px;line-height:1.35}
+.me{margin-left:auto;background:var(--p3);border-bottom-right-radius:6px}
+.ai{border:1px solid var(--ln);border-bottom-left-radius:6px;color:#e5e7eb}
+.draft{background:var(--p2);border:1px solid rgba(255,255,255,.18);border-radius:22px;padding:14px;margin:0 0 12px}
+.dh{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--mu);margin:0 0 10px}
+.fg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.fg label{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--mu);display:grid;gap:3px}
+.fg .w{grid-column:1/-1}
+select,input{font:16px Oswald,sans-serif;letter-spacing:.02em;color:#fff;background:var(--p1);border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:6px 9px;min-height:42px;width:100%}
+.fg label.bad select,.fg label.bad input{border-color:var(--warn)}
+.warn{list-style:none;padding:0;margin:10px 0 0;font-size:14px;color:var(--warn)}
+.btns{display:flex;gap:8px;margin-top:12px}
+.btn{flex:1;min-height:44px;border-radius:999px;border:0;background:#fff;color:#000;font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:.08em}
+.btn:disabled{opacity:.3;cursor:not-allowed}
+.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.25)}
+.done{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--p2);border:1px solid var(--ln);border-radius:16px;padding:8px 8px 8px 14px;margin:0 0 12px;font-size:14px}
+.done b{color:var(--in)}
+.lnk{background:none;border:0;color:var(--mu);font-size:13px;text-transform:uppercase;letter-spacing:.08em;min-height:40px;padding:0 8px}
+.lnk:hover{color:#fff}
+.sug{display:flex;gap:8px;overflow-x:auto;padding:0 16px 8px;scrollbar-width:none}
+.sug::-webkit-scrollbar{display:none}
+.sug button{flex:none;background:rgba(28,28,30,.9);border:1px solid var(--ln);border-radius:999px;padding:8px 14px;font-size:14px;min-height:40px;color:#d1d5db}
+.comp{padding:0 14px 10px}
+.comp form{display:flex;gap:8px;align-items:center;background:rgba(28,28,30,.92);border:1px solid rgba(255,255,255,.15);border-radius:28px;padding:5px}
+.comp input{border:0;background:transparent;min-height:40px;padding:0 12px}
+.comp input::placeholder{color:#6b7280}
+.send{width:40px;height:40px;flex:none;border-radius:50%;border:0;background:#fff;color:#000;font-size:18px;font-weight:700}
+nav{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--ln);background:rgba(0,0,0,.85);padding:8px 6px max(14px,env(safe-area-inset-bottom))}
+nav button{background:none;border:0;color:#6b7280;font-size:19px;font-weight:700;letter-spacing:.12em;min-height:46px}
+nav button[aria-pressed=true]{color:#fff}
+.seg{display:flex;gap:6px;margin:0 0 14px;flex-wrap:wrap}
+.seg button{background:var(--p2);border:1px solid var(--ln);color:var(--mu);border-radius:999px;padding:6px 14px;min-height:40px;font-size:14px;text-transform:uppercase;letter-spacing:.08em}
+.seg button[aria-pressed=true]{background:#fff;color:#000;border-color:#fff}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.row .d{font-size:16px;font-weight:600}
+.row .m{font-size:13px;color:var(--mu)}
+.amt{font-weight:600;white-space:nowrap;text-align:right}
+.in{color:var(--in)}.out{color:var(--out)}
+.ra{grid-column:1/-1;display:flex;margin-left:-8px}
+.scroll{overflow-x:auto;border:1px solid var(--ln);border-radius:12px}
+table.xl{border-collapse:collapse;font:13px system-ui,sans-serif;letter-spacing:0;width:max-content;min-width:100%}
+.xl th,.xl td{border:1px solid rgba(255,255,255,.1);padding:5px 8px;white-space:nowrap}
+.xl thead th{background:var(--p3);color:var(--mu);font-weight:500}
+.xl .rn{background:var(--p3);color:var(--mu);text-align:center}
+.xl .hd td{font-weight:600;background:#17171a}
+.xl .num{text-align:right;font-variant-numeric:tabular-nums}
+.xl .tot td{font-weight:700;border-top:2px solid rgba(255,255,255,.35)}
+.note{font-size:13px;color:var(--mu);margin:10px 0 0}
+.card{background:var(--p2);border:1px solid var(--ln);border-radius:22px;padding:14px 16px;margin:0 0 12px}
+.kp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.kp div{background:var(--p1);border-radius:14px;padding:10px}
+.kp small{display:block;font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.1em}
+.kp b{font-size:17px;white-space:nowrap}
+.prj{display:flex;justify-content:space-between;align-items:baseline;gap:12px;width:100%;background:none;border:0;border-bottom:1px solid rgba(255,255,255,.07);padding:13px 0;text-align:left}
+.prj .n{font-size:17px;font-weight:700;letter-spacing:.06em}
+.prj .s{font-size:13px;color:var(--mu);white-space:nowrap}
+.search{margin:0 0 8px}
+.empty{color:var(--mu);text-align:center;padding:40px 10px}
+.toast{position:absolute;left:14px;right:14px;bottom:96px;background:#fff;color:#000;border-radius:14px;padding:4px 4px 4px 14px;display:none;justify-content:space-between;align-items:center;z-index:20}
+.toast.on{display:flex}
+.toast button{background:none;border:0;font-weight:700;min-height:40px;padding:0 12px;text-transform:uppercase;color:#000}
+/* login */
+.login{position:absolute;inset:0;z-index:40;background:#121212;display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:56px 24px 22px;text-align:center}
+.login h2{margin:0;font-size:32px;font-weight:700;text-transform:uppercase}
+.login .sub{color:var(--mu);font-size:13px;letter-spacing:.2em;text-transform:uppercase;margin-top:4px}
+.ppl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 18px;margin-top:30px}
+.ppl button{background:none;border:0;display:grid;justify-items:center;gap:6px;color:var(--mu);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.ppl span{width:64px;height:64px;border-radius:50%;background:var(--p2);display:grid;place-items:center;color:#fff;font-size:20px;font-weight:700;border:2px solid transparent}
+.ppl button[aria-pressed=true] span{border-color:#fff}
+.dots{display:flex;justify-content:center;gap:18px;margin:26px 0 0;height:16px}
+.dots i{width:15px;height:15px;border-radius:50%;border:2.5px solid #fff}
+.dots i.f{background:#fff}
+.keys{display:grid;grid-template-columns:repeat(3,70px);gap:16px 26px;justify-content:center}
+.keys button{width:70px;height:70px;border-radius:50%;border:0;background:var(--p2);font-size:28px;font-weight:500}
+.keys button:active{background:#374151}
+.keys .x{background:transparent;font-size:20px}
+.ver{font-size:11px;color:#6b7280;letter-spacing:.12em;text-transform:uppercase;font-weight:700}
+.shake{animation:sh .35s}
+@keyframes sh{20%,60%{transform:translateX(-9px)}40%,80%{transform:translateX(9px)}}
+.sheet{position:absolute;inset:0;z-index:30;background:rgba(0,0,0,.6);display:none;align-items:flex-end}
+.sheet.on{display:flex}
+.sheet>div{width:100%;background:var(--p2);border-radius:24px 24px 0 0;padding:20px 18px max(24px,env(safe-area-inset-bottom));border-top:1px solid var(--ln)}
+.sheet p{margin:0 0 14px;color:var(--mu)}
+.sheet b{display:block;color:#fff;font-size:20px}
+@media(prefers-reduced-motion:no-preference){.draft,.msg,.done{animation:up .2s ease-out}@keyframes up{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <div class="login" id="login">
+    <div>
+      <h2 id="lt">Chi sei?</h2>
+      <div class="sub">Solum Studio</div>
+      <div class="ppl" id="ppl"></div>
+      <div class="dots" id="dots" hidden><i></i><i></i><i></i><i></i></div>
+    </div>
+    <div class="keys" id="keys" hidden></div>
+    <div class="ver">Demo locale · dati di esempio · PIN demo: 4 cifre qualsiasi</div>
+  </div>
+
+  <header><h1 id="ttl">Solum</h1><button class="av" id="av" data-act="menu" aria-label="Profilo">AL</button></header>
+  <main class="scr" id="scr"></main>
+  <div class="sug" id="sug"></div>
+  <div class="comp" id="comp"><form id="f"><input id="q" autocomplete="off" placeholder="Chiedi o inserisci una spesa…" aria-label="Messaggio"><button class="send" type="submit" aria-label="Invia">↑</button></form></div>
+  <div class="toast" id="toast"><span id="tmsg"></span><button data-act="restore">Annulla</button></div>
+  <nav>
+    <button data-act="tab" data-tab="studio" aria-pressed="false">STUDIO</button>
+    <button data-act="tab" data-tab="solum" aria-pressed="true">SOLUM</button>
+    <button data-act="tab" data-tab="archive" aria-pressed="false">ARCHIVE</button>
+  </nav>
+  <div class="sheet" id="sheet" data-act="closemenu"><div><p><b id="mn"></b><span id="mr"></span></p><button class="btn ghost" data-act="logout" style="width:100%">Esci</button></div></div>
+</div>
+
+<script>
+{
+const USERS={AL:['Alessandro','Socio'],MA:['Mattia','Socio'],FG:['Filippo','Socio'],LC:['Lorenzo','Socio'],CO:['Collaboratore','Collaboratore']};
+const NAMES={AL:'alessandro',MA:'mattia',FG:'filippo',LC:'lorenzo'};
+const PROJ={'101':'101_Residenza urbana','102':'102_Casa sul lago','103':'103_Scuola di quartiere','000':'Spese generali studio'};
+const KW_OUT=[['Affitto',/affitt/],['Utenze',/bollett|luce|elettric|\bgas\b|internet|telefon/],['Pulizie',/pulizi/],['Plotter e stampe',/plotter|stamp|carta|toner/],['Software e licenze',/software|licenz|rhino|autocad|adobe|archicad|abbonament/],['Trasferte',/treno|benzin|autostrad|taxi|trasfert|parchegg|sopralluog/],['Materiali e modelli',/plastic|modell|material|campion/],['Cancelleria',/cancelleri|penne|quadern/],['Consulenze esterne',/consulen|ingegner|geometr|strutturist/],['Tasse e contributi',/tass|\bf24\b|\biva\b|inarcassa|contribut/]];
+const KW_IN=[['Onorari',/fattur|onorar|parcell|acconto/],['Rimborsi',/rimbors/],['Altre entrate',/$^/]];
+const COUT=KW_OUT.map(k=>k[0]),CIN=KW_IN.map(k=>k[0]);
+const GENERAL=['Affitto','Utenze','Pulizie','Software e licenze','Cancelleria','Tasse e contributi'];
+const SUG=['Ho speso 50 € di carta plotter per il 101','Mattia ha pagato l’affitto di novembre, 1.200 €','Incassata fattura da 3.500 € per Casa sul lago','Marco ha speso 30 € di treno ieri','Quanto abbiamo speso per il 101?'];
+let me='AL',pick='',pin='',tab='solum',sv='reg',sheet='mov',arch='',q='',seq=7,did=1,lastDel=null,tt=null;
+let rows=[
+ {id:1,date:'2026-11-03',desc:'Affitto studio novembre',proj:'000',cat:'Affitto',payer:'MA',type:'uscita',amount:1200},
+ {id:2,date:'2026-11-05',desc:'Carta plotter A0',proj:'101',cat:'Plotter e stampe',payer:'MA',type:'uscita',amount:25},
+ {id:3,date:'2026-11-10',desc:'Rinnovo licenza Rhino',proj:'000',cat:'Software e licenze',payer:'AL',type:'uscita',amount:995},
+ {id:4,date:'2026-11-12',desc:'Incasso fattura acconto',proj:'101',cat:'Onorari',payer:'AL',type:'entrata',amount:2000},
+ {id:5,date:'2026-11-14',desc:'Treno per sopralluogo',proj:'102',cat:'Trasferte',payer:'FG',type:'uscita',amount:18.4},
+ {id:6,date:'2026-11-16',desc:'Modello in legno concorso',proj:'103',cat:'Materiali e modelli',payer:'LC',type:'uscita',amount:140}
+];
+const storageKey='solum-studio-demo-v1';
+try {
+ const saved=JSON.parse(localStorage.getItem(storageKey));
+ if(saved && Array.isArray(saved.rows) && Number.isSafeInteger(saved.seq)){
+  rows=saved.rows;
+  seq=saved.seq;
+ }
+} catch {}
+function persist(){
+ try {localStorage.setItem(storageKey,JSON.stringify({rows,seq}));}
+ catch {toast('Salvataggio locale non disponibile');}
+}
+let chat=[],drafts={};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const eur=n=>{const s=Math.abs(n).toFixed(2).split('.');return (n<0?'-':'')+s[0].replace(/\B(?=(\d{3})+(?!\d))/g,'.')+','+s[1]+' €'};
+const pad=n=>String(n).padStart(2,'0');
+const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const dmy=s=>{const [y,m,d]=s.split('-');return d+'/'+m+'/'+y};
+
+/* --- reading a sentence (simulated; the real version uses an AI model on the server) --- */
+function amountOf(src){const m=src.match(/€\s*(\d[\d.]*(?:,\d{1,2})?)|(\d[\d.]*(?:,\d{1,2})?)\s*(?:€|euro\b|eur\b)/i);if(!m)return null;const v=parseFloat((m[1]||m[2]).replace(/\./g,'').replace(',','.'));return isFinite(v)&&v>0?{v,raw:m[0]}:null}
+function payerOf(src){const t=src.toLowerCase();for(const c in NAMES)if(new RegExp('\\b'+NAMES[c]+'\\b').test(t))return{c};const k=src.match(/\b(AL|MA|FG|LC)\b/);if(k)return{c:k[1]};const u=src.match(/\b([A-Z][a-zàèéìòù]+)\s+(?:ha|hanno)\s+(?:pagato|speso|comprato|anticipato|incassato)/)||src.match(/da parte di\s+([A-Z][a-zàèéìòù]+)/);if(u)return{unknown:u[1]};return{c:me}}
+function catOf(t,type){for(const [n,re] of (type==='entrata'?KW_IN:KW_OUT))if(re.test(t))return n;return type==='entrata'?'Onorari':''}
+function projOf(t){const m=t.match(/\b(10[1-3])\b/);if(m)return m[1];if(/residenza/.test(t))return'101';if(/lago/.test(t))return'102';if(/scuola/.test(t))return'103';if(/studio|general/.test(t))return'000';return''}
+function dateOf(t){const d=new Date();if(/\bieri\b/.test(t))d.setDate(d.getDate()-1);const m=t.match(/\b(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?\b/);if(m){let y=m[3]?+m[3]:d.getFullYear();if(y<100)y+=2000;return iso(new Date(y,+m[2]-1,+m[1]))}return iso(d)}
+function parse(src){
+ const t=src.toLowerCase(),a=amountOf(src);
+ const type=/incass|ricevut|entrat|ci hanno pagato/.test(t)?'entrata':'uscita';
+ const p=payerOf(src),cat=catOf(t,type);let proj=projOf(t);
+ if(!proj&&GENERAL.includes(cat))proj='000';
+ let desc=src;if(a)desc=desc.replace(a.raw,'');
+ desc=desc.replace(/\b(alessandro|mattia|filippo|lorenzo|ieri|oggi)\b/gi,'').replace(/\b(ho|abbiamo|ha|hanno)\s+(speso|pagato|comprato|incassato|anticipato)\b/i,'').replace(/\s+per\s+(il\s+)?(progetto\s+)?10[1-3]\b/i,'').replace(/\b(per il|per|di|da)\s*[,.]?\s*$/i,'').replace(/\s+/g,' ').replace(/^\s*(di|del|della|dei|da|per)\s+/i,'').replace(/^[\s,.:-]+|[\s,.:-]+$/g,'');
+ desc=desc.charAt(0).toUpperCase()+desc.slice(1);
+ return{id:did++,type,amount:a?a.v:null,payer:p.c||'',unknown:p.unknown||'',cat,proj,date:dateOf(t),desc:desc.slice(0,70),state:'open'};
+}
+function validate(d){
+ const v=[];
+ if(!(d.amount>0))v.push(['amount','Manca l’importo']);
+ if(!d.payer)v.push(['payer',d.unknown?'«'+d.unknown+'» non è nel team: scegli chi ha '+(d.type==='entrata'?'incassato':'pagato'):'Scegli chi ha pagato']);
+ if(!(d.type==='entrata'?CIN:COUT).includes(d.cat))v.push(['cat','Scegli una categoria dall’elenco']);
+ if(!d.proj)v.push(['proj','A quale progetto va imputata?']);
+ if(!d.date)v.push(['date','Manca la data']);
+ return v;
+}
+const opts=(list,cur,blank)=>(blank?'<option value="">— scegli —</option>':'')+list.map(([v,l])=>`<option value="${esc(v)}"${v===cur?' selected':''}>${esc(l)}</option>`).join('');
+function form(d){
+ const v=validate(d),bad=new Set(v.map(x=>x[0])),cl=f=>bad.has(f)?' class="bad"':'';
+ const cats=(d.type==='entrata'?CIN:COUT).map(c=>[c,c]);
+ return `<div class="draft" data-id="${d.id}"><p class="dh">${d.editOf?'Modifica registrazione':'Bozza da confermare'}</p><div class="fg">
+ <label>Tipo<select data-f="type">${opts([['uscita','Uscita'],['entrata','Entrata']],d.type)}</select></label>
+ <label${cl('amount')}>Importo €<input data-f="amount" inputmode="decimal" value="${d.amount!=null?String(d.amount).replace('.',','):''}"></label>
+ <label${cl('payer')}>${d.type==='entrata'?'Incassato da':'Pagato da'}<select data-f="payer">${opts(Object.keys(USERS).map(k=>[k,k+' · '+USERS[k][0]]),d.payer,true)}</select></label>
+ <label${cl('cat')}>Categoria<select data-f="cat">${opts(cats,d.cat,true)}</select></label>
+ <label class="w${bad.has('proj')?' bad':''}">Progetto<select data-f="proj">${opts(Object.entries(PROJ),d.proj,true)}</select></label>
+ <label${cl('date')}>Data<input type="date" data-f="date" value="${esc(d.date)}"></label>
+ <label class="w">Descrizione<input data-f="desc" value="${esc(d.desc)}"></label></div>
+ <ul class="warn">${v.map(x=>'<li>'+esc(x[1])+'</li>').join('')}</ul>
+ <div class="btns"><button class="btn" data-act="confirm" data-id="${d.id}"${v.length?' disabled':''}>${d.editOf?'Salva':'Conferma'}</button><button class="btn ghost" data-act="cancel" data-id="${d.id}">Annulla</button></div></div>`;
+}
+function refresh(card,d){
+ const v=validate(d),bad=new Set(v.map(x=>x[0]));
+ card.querySelectorAll('[data-f]').forEach(el=>el.closest('label').classList.toggle('bad',bad.has(el.dataset.f)));
+ card.querySelector('.warn').innerHTML=v.map(x=>'<li>'+esc(x[1])+'</li>').join('');
+ card.querySelector('[data-act=confirm]').disabled=v.length>0;
+}
+const sign=r=>`<span class="${r.type==='entrata'?'in':'out'}">${r.type==='entrata'?'+':'−'} ${eur(r.amount)}</span>`;
+
+/* --- views --- */
+function chatHTML(){
+ return chat.map(m=>{
+  if(m.who==='d'){const d=drafts[m.id];if(!d)return'';
+   if(d.state==='saved'){const r=rows.find(x=>x.id===d.rowId);return r?`<div class="done"><span><b>Salvato</b> · ${esc(r.desc||r.cat)} · ${sign(r)}</span><button class="lnk" data-act="del" data-row="${r.id}">Annulla</button><button class="lnk" data-act="open-project" data-p="${esc(r.proj)}">Apri progetto</button></div>`:'<div class="done"><span>Registrazione eliminata</span></div>'}
+   if(d.state==='cancel')return '<div class="done"><span>Bozza scartata, nulla è stato salvato</span></div>';
+   return form(d)}
+  return `<div class="msg ${m.who==='u'?'me':'ai'}">${m.html}</div>`}).join('');
+}
+function rowHTML(r){
+ const d=Object.values(drafts).find(x=>x.editOf===r.id&&x.state==='open');if(d)return form(d);
+ return `<div class="row"><span class="d">${esc(r.desc||r.cat)}</span><span class="amt">${sign(r)}</span><span class="m">${dmy(r.date).slice(0,5)} · ${esc(PROJ[r.proj])} · ${esc(r.cat)} · ${r.payer}</span><span></span><span class="ra"><button class="lnk" data-act="edit" data-row="${r.id}">Modifica</button><button class="lnk" data-act="del" data-row="${r.id}">Elimina</button></span></div>`;
+}
+const sorted=list=>[...list].sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+function sums(list){const s={in:0,out:0,cat:{},who:{}};list.forEach(r=>{if(r.type==='entrata')s.in+=r.amount;else{s.out+=r.amount;s.cat[r.cat]=(s.cat[r.cat]||0)+r.amount;s.who[r.payer]=(s.who[r.payer]||0)+r.amount}});return s}
+function sheetData(){
+ const R=[...rows].sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id),s=sums(rows);
+ if(sheet==='mov')return{head:['Data','Descrizione','Progetto','Categoria','Pagato da','Entrate','Uscite'],num:[5,6],body:R.map(r=>[dmy(r.date),r.desc,PROJ[r.proj],r.cat,r.payer,r.type==='entrata'?r.amount:'',r.type==='uscita'?r.amount:'']),tot:['Totale','','','','',s.in,s.out]};
+ const b=[];Object.keys(s.cat).sort().forEach(c=>b.push(['Uscite',c,s.cat[c]]));
+ b.push(['Entrate','Totale entrate',s.in]);Object.keys(s.who).sort().forEach(w=>b.push(['Anticipato',w+' · '+USERS[w][0],s.who[w]]));
+ return{head:['Sezione','Voce','Importo'],num:[2],body:b,tot:['Saldo periodo','Entrate − uscite',s.in-s.out]};
+}
+function downloadSheet(){
+ const {head,body,tot}=sheetData();
+ const csvCell=value=>{
+  if(typeof value==='number')return value.toFixed(2).replace('.',',');
+  const str=String(value??'');
+  const safe=/^\s*[=+\-@]|^[\t\r\n]/.test(str)?"'"+str:str;
+  return '"'+safe.replace(/"/g,'""')+'"';
+ };
+ const csv=[head,...body,tot].map(row=>row.map(csvCell).join(';')).join('\r\n');
+ const url=URL.createObjectURL(new Blob(['\uFEFF',csv],{type:'text/csv;charset=utf-8'}));
+ const link=document.createElement('a');
+ link.href=url;
+ link.download=sheet==='mov'?'solum-movimenti.csv':'solum-riepilogo.csv';
+ document.body.append(link);
+ link.click();
+ link.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function studioHTML(){
+ let h=`<div class="seg"><button data-act="sv" data-v="reg" aria-pressed="${sv==='reg'}">Registro</button><button data-act="sv" data-v="sheet" aria-pressed="${sv==='sheet'}">Foglio</button></div>`;
+ if(sv==='reg')return h+(rows.length?sorted(rows).map(rowHTML).join(''):'<p class="empty">Nessuna registrazione.</p>');
+ const S=sheetData(),L='ABCDEFG',cell=(v,i)=>`<td class="${S.num.includes(i)?'num':''}">${typeof v==='number'?esc(eur(v)):esc(v)}</td>`;
+ return h+`<div class="seg"><button data-act="sheet" data-v="mov" aria-pressed="${sheet==='mov'}">Movimenti</button><button data-act="sheet" data-v="rie" aria-pressed="${sheet==='rie'}">Riepilogo</button></div>
+ <div class="scroll"><table class="xl"><thead><tr><th class="rn"></th>${S.head.map((x,i)=>'<th>'+L[i]+'</th>').join('')}</tr></thead><tbody>
+ <tr class="hd"><td class="rn">1</td>${S.head.map(x=>'<td>'+x+'</td>').join('')}</tr>
+ ${S.body.map((r,j)=>`<tr><td class="rn">${j+2}</td>${r.map(cell).join('')}</tr>`).join('')}
+ <tr class="tot"><td class="rn">${S.body.length+2}</td>${S.tot.map(cell).join('')}</tr></tbody></table></div>
+ <div class="btns"><button class="btn" data-act="download">Scarica CSV</button><button class="btn ghost" data-act="copy">Copia per Excel</button></div><p class="note" id="cpy">Esporta il foglio selezionato in formato CSV per Excel.</p>`;
+}
+function archiveHTML(){
+ if(arch){const list=rows.filter(r=>r.proj===arch),s=sums(list);
+  return `<button class="lnk" data-act="arch" data-p="" style="margin-left:-8px">← Archivio</button>
+  <div class="card"><p class="dh">${esc(arch==='000'?'Studio':arch)}</p><div style="font-size:22px;font-weight:700;text-transform:uppercase;margin:-4px 0 12px">${esc(PROJ[arch])}</div>
+  <div class="kp"><div><small>Entrate</small><b class="in">${eur(s.in)}</b></div><div><small>Uscite</small><b class="out">${eur(s.out)}</b></div><div><small>Saldo</small><b>${eur(s.in-s.out)}</b></div></div></div>
+  <p class="dh">Movimenti del progetto</p>${list.length?sorted(list).map(rowHTML).join(''):'<p class="empty">Nessun movimento.</p>'}`}
+ const ps=Object.keys(PROJ).filter(k=>!q||PROJ[k].toLowerCase().includes(q.toLowerCase()));
+ return `<div class="search"><input id="ps" placeholder="Cerca progetto…" value="${esc(q)}" aria-label="Cerca progetto"></div>`+
+  ps.map(k=>{const s=sums(rows.filter(r=>r.proj===k));return `<button class="prj" data-act="arch" data-p="${k}"><span class="n">${esc(PROJ[k])}</span><span class="s">${eur(s.out)} uscite</span></button>`}).join('')||'<p class="empty">Nessun progetto trovato.</p>';
+}
+function render(keepScroll){
+ const sc=$('#scr'),top=sc.scrollTop;
+ sc.innerHTML=tab==='solum'?chatHTML():tab==='studio'?studioHTML():archiveHTML();
+ $('#ttl').textContent=tab==='solum'?'Solum':tab==='studio'?'Studio':'Archive';
+ $('#comp').hidden=$('#sug').hidden=tab!=='solum';
+ document.querySelectorAll('nav button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tab===tab));
+ if(tab==='solum')sc.scrollTop=sc.scrollHeight;else if(keepScroll)sc.scrollTop=top;
+}
+
+/* --- actions --- */
+function answer(src){
+ const t=src.toLowerCase(),p=projOf(t),c=catOf(t,'uscita');let who='';for(const k in NAMES)if(t.includes(NAMES[k]))who=k;
+ const f=rows.filter(r=>(!p||r.proj===p)&&(!c||r.cat===c||r.type==='entrata')&&(!who||r.payer===who));
+ const o=f.filter(r=>r.type==='uscita').reduce((a,r)=>a+r.amount,0),i=f.filter(r=>r.type==='entrata'&&!c).reduce((a,r)=>a+r.amount,0);
+ const lab=[p&&PROJ[p],c,who&&USERS[who][0]].filter(Boolean).join(' · ')||'tutto lo studio';
+ return `Per <b>${esc(lab)}</b>: uscite ${eur(o)}`+(c?'':`, entrate ${eur(i)}`)+` (${f.length} registrazioni).`;
+}
+function send(text){
+ text=text.trim();if(!text)return;
+ chat.push({who:'u',html:esc(text)});
+ if(!amountOf(text)&&(/\?/.test(text)||/^(quanto|qual|totale|quante)/i.test(text)))chat.push({who:'a',html:answer(text)});
+ else{const d=parse(text);drafts[d.id]=d;chat.push({who:'a',html:validate(d).length?'Ho preparato la bozza, ma manca qualcosa. Completa i campi evidenziati:':'Ecco la bozza. Controlla e conferma:'});chat.push({who:'d',id:d.id})}
+ tab='solum';render();
+}
+function confirm(id){
+ const d=drafts[id];if(!d||validate(d).length)return;
+ const r={date:d.date,desc:d.desc,proj:d.proj,cat:d.cat,payer:d.payer,type:d.type,amount:d.amount};
+ if(d.editOf){const existing=rows.find(x=>x.id===d.editOf);if(!existing)return;Object.assign(existing,r);persist();delete drafts[id];render(true);return}
+ r.id=seq++;rows.push(r);persist();d.state='saved';d.rowId=r.id;
+ chat.push({who:'a',html:'Salvato. Lo trovi in <b>Studio</b>, nel registro e nel foglio.'});render();
+}
+function toast(m){$('#tmsg').textContent=m;$('#toast').classList.add('on');clearTimeout(tt);tt=setTimeout(()=>$('#toast').classList.remove('on'),6000)}
+function startSession(){
+ $('#av').textContent=me;chat=[];drafts={};tab='solum';arch='';
+ chat.push({who:'a',html:'Ciao '+esc(USERS[me][0].split(' ')[0])+'. Scrivi una spesa, un incasso o una domanda: preparo la bozza e tu confermi.'});
+ render();
+}
+
+/* --- login --- */
+function drawLogin(){
+ $('#ppl').innerHTML=Object.keys(USERS).map(k=>`<button data-u="${k}" aria-pressed="${pick===k}"><span>${k}</span>${esc(USERS[k][1])}</button>`).join('');
+ $('#lt').textContent=pick?'Inserisci PIN':'Chi sei?';
+ $('#dots').hidden=$('#keys').hidden=!pick;
+ [...$('#dots').children].forEach((d,i)=>d.className=i<pin.length?'f':'');
+}
+$('#keys').innerHTML=['1','2','3','4','5','6','7','8','9','','0','⌫'].map(k=>k?`<button class="${k==='⌫'?'x':''}" data-k="${k}" aria-label="${k==='⌫'?'Cancella':k}">${k}</button>`:'<span></span>').join('');
+$('#ppl').addEventListener('click',e=>{const b=e.target.closest('[data-u]');if(!b)return;pick=b.dataset.u;pin='';drawLogin()});
+$('#keys').addEventListener('click',e=>{const b=e.target.closest('[data-k]');if(!b)return;const k=b.dataset.k;
+ if(k==='⌫')pin=pin.slice(0,-1);else if(pin.length<4)pin+=k;drawLogin();
+ if(pin.length===4)setTimeout(()=>{me=pick;pin='';$('#login').hidden=true;startSession()},150)});
+
+/* --- events --- */
+const app=$('#app');
+app.addEventListener('click',e=>{
+ const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
+ if(a==='closemenu'&&e.target!==b)return;
+ if(a==='tab'){tab=b.dataset.tab;if(tab!=='archive')arch='';render()}
+ else if(a==='sv'){sv=b.dataset.v;render()}
+ else if(a==='sheet'){sheet=b.dataset.v;render()}
+ else if(a==='arch'||a==='open-project'){tab='archive';arch=b.dataset.p;render()}
+ else if(a==='confirm')confirm(+b.dataset.id);
+ else if(a==='cancel'){const d=drafts[+b.dataset.id];if(d.editOf)delete drafts[d.id];else d.state='cancel';render(true)}
+ else if(a==='edit'){const r=rows.find(x=>x.id===+b.dataset.row);const d={...r,id:did++,editOf:r.id,unknown:'',state:'open'};drafts[d.id]=d;render(true)}
+ else if(a==='del'){const i=rows.findIndex(x=>x.id===+b.dataset.row);if(i<0)return;lastDel={r:rows[i],i};rows.splice(i,1);render(true);toast('Registrazione eliminata');persist()}
+ else if(a==='restore'){if(lastDel){rows.splice(lastDel.i,0,lastDel.r);lastDel=null;render(true);$('#toast').classList.remove('on');persist()}}
+ else if(a==='menu'){$('#mn').textContent=USERS[me][0];$('#mr').textContent=USERS[me][1];$('#sheet').classList.add('on')}
+ else if(a==='closemenu')$('#sheet').classList.remove('on');
+ else if(a==='logout'){$('#sheet').classList.remove('on');pick='';pin='';drawLogin();$('#login').hidden=false}
+ else if(a==='download')downloadSheet();
+ else if(a==='copy'){const S=sheetData(),f=v=>typeof v==='number'?v.toFixed(2).replace('.',','):v;const tsv=[S.head,...S.body,S.tot].map(r=>r.map(f).join('\t')).join('\n');const out=$('#cpy');const no=()=>out.textContent='Il browser non consente la copia in questa anteprima.';
+  try{navigator.clipboard.writeText(tsv).then(()=>out.textContent='Copiato: incollalo in una cella di Excel.',no)}catch(_){no()}}
+});
+function onField(e){
+ const el=e.target;
+ if(el.id==='ps'){q=el.value;const pos=el.selectionStart;render();const n=$('#ps');n.focus();n.setSelectionRange(pos,pos);return}
+ if(!el.dataset||!el.dataset.f)return;const card=el.closest('.draft');const d=drafts[+card.dataset.id];if(!d)return;const f=el.dataset.f;
+ if(f==='amount'){const v=parseFloat(el.value.replace(/\./g,'').replace(',','.'));d.amount=isFinite(v)?v:null}else d[f]=el.value;
+ if(f==='type'){if(!(d.type==='entrata'?CIN:COUT).includes(d.cat))d.cat=d.type==='entrata'?'Onorari':'';card.outerHTML=form(d);return}
+ refresh(card,d);
+}
+app.addEventListener('input',onField);app.addEventListener('change',e=>{if(e.target.id!=='ps')onField(e)});
+$('#f').addEventListener('submit',e=>{e.preventDefault();const i=$('#q');send(i.value);i.value=''});
+$('#sug').innerHTML=SUG.map(s=>`<button data-s="${esc(s)}">${esc(s)}</button>`).join('');
+$('#sug').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(b)send(b.dataset.s)});
+
+drawLogin();render();
+}
+</script>
+</body>
+</html>
